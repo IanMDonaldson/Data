@@ -1,17 +1,11 @@
 package com.iandonaldson.data;
-/* a) list all the stores and their addresses (that’s going to require a Join)
- * b) list the stores and their staff.
- * That’s going to require a Join AND using an inherited class. 
- * 1 – List all movies and actors
- * 2 – List all stores and addresses
- * 3 – List all stores and staff.*/
-import java.sql.Statement;
+
 import java.util.Date;
-import java.sql.Connection;
-import java.sql.ResultSet;
 
 public class Customer {
 	private int storeID;
+	private int ID;
+	private int addressID;
 	private String firstName;
 	private String lastName;
 	private String email;
@@ -72,5 +66,21 @@ public class Customer {
 	
 	public Date getLastUpdateDate() {
 		return this.lastUpdate;
+	}
+
+	public int getID() {
+		return ID;
+	}
+
+	public void setID(int iD) {
+		ID = iD;
+	}
+
+	public int getAddressID() {
+		return addressID;
+	}
+
+	public void setAddressID(int addressID) {
+		this.addressID = addressID;
 	}
 }

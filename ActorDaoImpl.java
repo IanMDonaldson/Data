@@ -16,25 +16,17 @@ import java.util.List;
 
 
 public class ActorDaoImpl implements ActorDao {
-	//preparedStatement ps add this for all statements = conn.prepareStatment(?, ? ...) ps.setInt(1, Id) ps.setInt(2, title) ...
 	public ActorDaoImpl() {
 		
 	}
+	
 	@Override
 	public List<Actor> setActorsForFilm(Film film) {
 		List<Actor> actorList = new LinkedList<Actor>();
-		//String query = "Select * from actor join film_actor on actor.actor_id = film_actor.actor_id where film_actor.film_id= ?" 
-				/* Integer.toString(film.getId()) */
 		Connection conn = ConnectionFactory.getConnection();
 		try {
-			PreparedStatement ps = conn.prepareStatement("Select ? from ? join ? on ?=? where ?=?");
-			ps.setString(1, "*");
-			ps.setString(2,  "actor");
-			ps.setString(3, "film_actor");
-			ps.setString(4, "actor.actor_id");
-			ps.setString(5, "film_actor.actor_id");
-			ps.setString(6, "film_actor.film_id");
-			ps.setString(7, Integer.toString(film.getId()));
+			PreparedStatement ps = conn.prepareStatement("Select * from actor join film_actor on actor.actor_id = film_actor.actor_id where film_actor.film_id= ?");
+			ps.setInt(1, film.getId());
 			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				Actor actor = new Actor();
@@ -78,9 +70,7 @@ public class ActorDaoImpl implements ActorDao {
 		List<Actor> actorList = new LinkedList<Actor>();
 		Connection conn = ConnectionFactory.getConnection();
 		try {
-			PreparedStatement ps = conn.prepareStatement("Select ? from ?;");
-			ps.setString(1, "*");
-			ps.setString(2, "actor");
+			PreparedStatement ps = conn.prepareStatement("Select * from actor;");
 			actorList = getActors(ps);
 			ps.close();
 			conn.close();
@@ -94,11 +84,11 @@ public class ActorDaoImpl implements ActorDao {
 	public Actor getActor(int Id) {
 		Actor actor = new Actor();
 		FilmDaoImpl filmDaoImpl = new FilmDaoImpl();
-		String query = "select * from sakila.actor where actor.actor_id = " + Integer.toString(Id) + ";";
 		try {
 			Connection conn = ConnectionFactory.getConnection();
-			Statement st = conn.createStatement();
-			ResultSet rs = st.executeQuery(query);
+			PreparedStatement ps = conn.prepareStatement("select * from actor where actor.actor_id = ?;");
+			ps.setInt(1, Id);
+			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				actor.setFirstName(rs.getString("first_name"));
 				actor.setLastName(rs.getString("last_name"));
@@ -107,7 +97,7 @@ public class ActorDaoImpl implements ActorDao {
 				actor.setFilmList(filmDaoImpl.setFilmsForActor(actor));
 			}
 			conn.close();
-			st.close();
+			ps.close();
 			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();

@@ -1,5 +1,6 @@
 package com.iandonaldson.data;
 
+import java.util.Date;
 
 public class Location {
 	private String address;
@@ -7,6 +8,7 @@ public class Location {
 	private String district;
 	private String phoneNumber;
 	private String country;
+	private Date lastUpdate;
 	private int postalCode;
 	private int addressID;
 	private int cityID;
@@ -73,6 +75,14 @@ public class Location {
 
 	public void setCountry(String country) {
 		this.country = country;
+	}
+
+	public Date getLastUpdate() {
+		return lastUpdate;
+	}
+
+	public void setLastUpdate(Date lastUpdate) {
+		this.lastUpdate = lastUpdate;
 	}
 	
 }

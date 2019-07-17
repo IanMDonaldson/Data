@@ -1,15 +1,9 @@
 package com.iandonaldson.data;
 
-/* a) list all the stores and their addresses (that’s going to require a Join)
- * b) list the stores and their staff.
- * That’s going to require a Join AND using an inherited class. 
- * 1 – List all movies and actors
- * 2 – List all stores and addresses
- * 3 – List all stores and staff.*/
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,14 +12,15 @@ public class FilmDaoImpl implements FilmDao {
 	public FilmDaoImpl() {
 		
 	}
-	
+	@Override
 	public List<Film> setFilmsForActor(Actor actor) {
 		List<Film> filmList = new LinkedList<Film>();
-		String query = "Select * from film join film_actor on film.film_id = film_actor.film_id where film_actor.actor_id = " + Integer.toString(actor.getId()) + ";";
 		try {
 			Connection conn = ConnectionFactory.getConnection();
-			Statement st = conn.createStatement();
-			ResultSet rs = st.executeQuery(query);
+			PreparedStatement ps = conn.prepareStatement(
+					"Select * from film join film_actor on film.film_id = film_actor.film_id where film_actor.actor_id = ?;");
+			ps.setInt(1, actor.getId());
+			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				Film film = new Film();
 				film.setId(rs.getInt("film_id"));
@@ -40,7 +35,7 @@ public class FilmDaoImpl implements FilmDao {
 				filmList.add(film);
 			}
 			rs.close();
-			st.close();
+			ps.close();
 			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -49,13 +44,11 @@ public class FilmDaoImpl implements FilmDao {
 	}
 
 	//helper function
-	public List<Film> getFilms(String query) {
+	public List<Film> getFilms(PreparedStatement ps) {
 		List<Film> filmList = new LinkedList<Film>();
 		ActorDaoImpl actorDaoImpl = new ActorDaoImpl();
 		try {
-			Connection conn = ConnectionFactory.getConnection();
-			Statement st = conn.createStatement();
-			ResultSet rs = st.executeQuery(query);
+			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				Film film = new Film();
 				film.setId(rs.getInt("film_id"));
@@ -71,8 +64,6 @@ public class FilmDaoImpl implements FilmDao {
 				filmList.add(film);
 			}
 			rs.close();
-			st.close();
-			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -81,32 +72,21 @@ public class FilmDaoImpl implements FilmDao {
 	}
 	
 	
-	@Override //used by actorDaoImpl to set its films
-	public List<Film> getFilmsByActor(int actorID) { 
-		String query = "Select * from film join film_actor on film.film_id = film_actor.film_id where film_actor.actor_id = " + Integer.toString(actorID) + ";";
-		return getFilms(query);
-	}
+	//@Override
+//	public List<Film> getFilmsByActor(int actorID) { 
+//		String query = "Select * from film join film_actor on film.film_id = film_actor.film_id where film_actor.actor_id = " + Integer.toString(actorID) + ";";
+//		return getFilms(query);
+//	}
 	@Override
 	public List<Film> getAllFilms() {
 		List<Film> filmList = new LinkedList<Film>();
 		try {
 			Connection conn = ConnectionFactory.getConnection();
-			Statement st = conn.createStatement();
-			ResultSet rs = st.executeQuery("select * from film");
-			while (rs.next()) {
-				Film film = new Film();
-				film.setId(rs.getInt("film_id"));
-				film.setTitle(rs.getString("title"));
-				film.setDescription(rs.getString("description"));
-				film.setReleaseDate(rs.getDate("release_year"));
-				film.setLength(rs.getInt("length"));
-				film.setLanguageId(rs.getInt("language_id"));
-				film.setRentalDuration(rs.getInt("rental_duration"));
-				film.setRentalRate(rs.getDouble("rental_rate"));
-				film.setReplacementCost(rs.getDouble("replacement_cost"));
-				// [TODO set actor list for each film]
-				filmList.add(film);
-			}
+			PreparedStatement ps = conn.prepareStatement("select * from film");
+			
+			filmList = getFilms(ps);
+			
+			ps.close();
 			conn.close();
 		} catch(SQLException e) {
 			e.printStackTrace();
@@ -115,13 +95,15 @@ public class FilmDaoImpl implements FilmDao {
 	}
 
 	@Override
-	public Film getFilm(int Id) {
+	public Film getFilm(int ID) {
 		Film film = new Film();
-		
-		Connection conn = ConnectionFactory.getConnection();
+		ActorDaoImpl actorDaoImpl = new ActorDaoImpl();
 		try {
-			Statement st = conn.createStatement();
-			ResultSet rs = st.executeQuery("Select * from sakila.film where film_id = " + Id);
+			Connection conn = ConnectionFactory.getConnection();
+			
+			PreparedStatement ps = conn.prepareStatement("Select * from sakila.film where film_id = ?");
+			ps.setInt(1, ID);
+			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
 				film.setTitle(rs.getString("title"));
 				film.setDescription(rs.getString("description"));
@@ -131,6 +113,7 @@ public class FilmDaoImpl implements FilmDao {
 				film.setRentalDuration(rs.getInt("rental_duration"));
 				film.setRentalRate(rs.getDouble("rental_rate"));
 				film.setReplacementCost(rs.getDouble("replacement_cost"));
+				film.setActorList(actorDaoImpl.setActorsForFilm(film));
 			} 
 			else {
 				film = null;

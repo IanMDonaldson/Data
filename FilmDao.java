@@ -8,7 +8,7 @@ package com.iandonaldson.data;
 import java.util.List;
 
 public interface FilmDao {
-	public List<Film> getFilmsByActor(int actorID);//used by actorDaoImpl to set its films
+	public List<Film> setFilmsForActor(Actor actor);//used by actorDaoImpl to set its films
 	public List<Film> getAllFilms();
 	public Film getFilm(int Id);
 	public boolean updateFilm(Film film);

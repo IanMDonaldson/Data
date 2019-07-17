@@ -1,15 +1,9 @@
 package com.iandonaldson.data;
-/* a) list all the stores and their addresses (that’s going to require a Join)
- * b) list the stores and their staff.
- * That’s going to require a Join AND using an inherited class. 
- * 1 – List all movies and actors
- * 2 – List all stores and addresses
- * 3 – List all stores and staff.*/
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,22 +24,22 @@ public class CustomerDaoImpl implements CustomerDao {
 				customer.setEmail(rs.getString("email"));
 				customer.setStoreID(rs.getInt("store_id"));
 				customer.setLastUpdate(rs.getDate("last_update"));
+				customer.setAddressID(rs.getInt("address_id"));
+				customer.setID(rs.getInt("customer_id"));
 				customerList.add(customer);
 			}
 			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return customerList;
 	}
 	@Override
 	public List<Customer> getAllCustomers() {
 		List<Customer> customerList = new LinkedList<Customer>();
 		try {
 			Connection conn = ConnectionFactory.getConnection();
-			PreparedStatement ps = conn.prepareStatement("select ? from ?;");
-			ps.setString(1, "*");
-			ps.setString(2, "customer");
+			PreparedStatement ps = conn.prepareStatement("select * from customer;");
 			customerList = getCustomers(ps);
 			conn.close();
 			ps.close();
@@ -61,11 +55,8 @@ public class CustomerDaoImpl implements CustomerDao {
 		
 		Connection conn = ConnectionFactory.getConnection();	
 		try {
-			PreparedStatement ps = conn.prepareStatement("select ? from ? where ?=?");
-			ps.setString(1, "*");
-			ps.setString(2, "customer");
-			ps.setString(3, "customer_id");
-			ps.setString(4, Integer.toString(Id));
+			PreparedStatement ps = conn.prepareStatement("select * from customer where customer_id=?");
+			ps.setInt(1, Id);
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
 				
@@ -75,6 +66,8 @@ public class CustomerDaoImpl implements CustomerDao {
 				customer.setEmail(rs.getString("email"));
 				customer.setCreateDate(rs.getDate("create_date"));
 				customer.setLastUpdate(rs.getDate("last_update"));
+				customer.setAddressID(rs.getInt("address_id"));
+				customer.setID(rs.getInt("customer_id"));
 			}
 			conn.close();
 			ps.close();
