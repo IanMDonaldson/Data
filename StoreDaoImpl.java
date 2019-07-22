@@ -14,32 +14,14 @@ public class StoreDaoImpl implements StoreDao {
 	public List<Store> getStoresForStaff(Staff staff) {
 		List<Store> storeList = new LinkedList<Store>();
 		LocationDaoImpl locationDaoImpl = new LocationDaoImpl();
-		/*String query = "SELECT store.staff_id, staff.first_name,staff.last_name/,staff.address_id/,staff.email/,"
-				+ "store.store_id/,staff.username,staff.password/,staff.last_update,store.manager_staff_id\n" + 
-				"FROM staff join store on staff.store_id = store.store_id\n" + 
-				"WHERE store.store_id = " + Integer.toString(staff.getStoreID()) + ";";*/
+		/*String query = */
 		try {
 			Connection conn = ConnectionFactory.getConnection();
-			PreparedStatement ps = conn.prepareStatement(
-					"SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?\n" + 
-					"FROM ? join ? on ? = ?\n" + 
-					"WHERE ? = ?;");
-			ps.setString(1, "store.staff_id");
-			ps.setString(2, "staff.first_name");
-			ps.setString(3, "staff.last_name");
-			ps.setString(4, "staff.address_id");
-			ps.setString(5, "staff.email");
-			ps.setString(6, "store.store_id");
-			ps.setString(7, "staff.username");
-			ps.setString(8, "staff.password");
-			ps.setString(9, "staff.last_update");
-			ps.setString(10, "store.manager_staff_id");
-			ps.setString(11, "staff");
-			ps.setString(12, "store");
-			ps.setString(13, "staff.store_id");
-			ps.setString(14, "store.store_id");
-			ps.setString(15, "store.store_id");
-			ps.setString(16, Integer.toString(staff.getStoreID()));
+			PreparedStatement ps = conn.prepareStatement("SELECT store.staff_id, staff.first_name,staff.last_name/,staff.address_id/,staff.email/,"
+				+ "store.store_id/,staff.username,staff.password/,staff.last_update,store.manager_staff_id\n" + 
+				"FROM staff join store on staff.store_id = store.store_id\n" + 
+				"WHERE store.store_id = ?");
+			ps.setInt(1, staff.getStoreID());
 			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				Store store = new Store();

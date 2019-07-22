@@ -7,8 +7,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-import org.mariadb.jdbc.*;
-@SuppressWarnings("unused")
+
 public class ConnectionFactory {
 
     public static Connection getConnection()

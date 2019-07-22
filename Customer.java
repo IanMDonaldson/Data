@@ -11,6 +11,7 @@ public class Customer {
 	private String email;
 	private Date createDate;
 	private Date lastUpdate;
+	private Location location;
 	
 	public Customer() {
 		
@@ -82,5 +83,13 @@ public class Customer {
 
 	public void setAddressID(int addressID) {
 		this.addressID = addressID;
+	}
+
+	public Location getLocation() {
+		return location;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 }

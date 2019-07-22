@@ -69,6 +69,12 @@ public class CustomerDaoImpl implements CustomerDao {
 				customer.setAddressID(rs.getInt("address_id"));
 				customer.setID(rs.getInt("customer_id"));
 			}
+			else {
+				conn.close();
+				ps.close();
+				rs.close();
+				return null;
+			}
 			conn.close();
 			ps.close();
 			rs.close();

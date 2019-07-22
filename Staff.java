@@ -12,6 +12,7 @@ public class Staff extends Person{
 	private String password;
 	private Date createDate;
 	private List<Store> worksAt;
+	private Location location;
 	
 	public Staff() {
 		
@@ -63,6 +64,12 @@ public class Staff extends Person{
 	}
 	public void setStaffID(int staffID) {
 		this.staffID = staffID;
+	}
+	public Location getLocation() {
+		return location;
+	}
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
 }

@@ -4,16 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
-/* a) list all the stores and their addresses (that’s going to require a Join)
- * b) list the stores and their staff.
- * That’s going to require a Join AND using an inherited class. 
- * 1 – List all movies and actors
- * 2 – List all stores and addresses
- * 3 – List all stores and staff.*/
-
 
 public class ActorDaoImpl implements ActorDao {
 	public ActorDaoImpl() {
@@ -36,6 +28,9 @@ public class ActorDaoImpl implements ActorDao {
 				actor.setLastUpdate(rs.getDate("last_update"));
 				actorList.add(actor);
 			}
+			rs.close();
+			ps.close();
+			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

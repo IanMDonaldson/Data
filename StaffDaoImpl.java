@@ -1,9 +1,9 @@
 package com.iandonaldson.data;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,13 +15,17 @@ public class StaffDaoImpl implements StaffDao {
 	public List<Staff> setStaffForStore(Store store) {
 		// TODO use preparedStatment
 		List<Staff> staffList = new LinkedList<Staff>();
+		LocationDaoImpl locationDaoImpl = new LocationDaoImpl();
 		String query = "SELECT staff.staff_id, staff.first_name,staff.last_name,staff.address_id,staff.email,store.store_id,staff.username,staff.password,staff.last_update,store.manager_staff_id\n" + 
 				"FROM staff join store on staff.store_id = staff.store_id\n" + 
 				"WHERE staff.store_id = " + Integer.toString(store.getStoreID()) + ";";
 		try {
 			Connection conn = ConnectionFactory.getConnection();
-			Statement st = conn.createStatement();
-			ResultSet rs = st.executeQuery(query);
+			PreparedStatement ps = conn.prepareStatement("SELECT staff.staff_id, staff.first_name,staff.last_name,staff.address_id,staff.email,store.store_id,staff.username,staff.password,staff.last_update,store.manager_staff_id\n" + 
+				"FROM staff join store on staff.store_id = staff.store_id\n" + 
+				"WHERE staff.store_id = ?;"); 
+			ps.setInt(1, store.getStoreID());
+			ResultSet rs = ps.executeQuery(query);
 			while (rs.next()) {
 				Staff staff = new Staff();
 				staff.setAddressID(rs.getInt("address_id"));
@@ -32,10 +36,11 @@ public class StaffDaoImpl implements StaffDao {
 				staff.setStaffID(rs.getInt("staff_id"));
 				staff.setPassword(rs.getString("password"));
 				staff.setUsername(rs.getString("username"));
+				staff.setLocation(locationDaoImpl.getLocation(staff.getAddressID()));
 				staffList.add(staff);
 			}
 			conn.close();
-			st.close();
+			ps.close();
 			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -43,14 +48,13 @@ public class StaffDaoImpl implements StaffDao {
 		return staffList;
 	}
 	
-	public List<Staff> getStaff(String query) {
+	public List<Staff> getStaff(PreparedStatement ps) {
 		// TODO have function take in PREPAREDsTATMENT parameter
 		List<Staff> staffList = new LinkedList<Staff>();
 		StoreDaoImpl storeDaoImpl = new StoreDaoImpl();
-		Connection conn = ConnectionFactory.getConnection();
+		LocationDaoImpl locationDaoImpl = new LocationDaoImpl();
 		try {
-			Statement st = conn.createStatement();
-			ResultSet rs = st.executeQuery(query);
+			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				Staff staff = new Staff();
 				staff.setAddressID(rs.getInt("address_id"));
@@ -62,10 +66,9 @@ public class StaffDaoImpl implements StaffDao {
 				staff.setPassword(rs.getString("password"));
 				staff.setUsername(rs.getString("username"));
 				staff.setWorksAt(storeDaoImpl.getStoresForStaff(staff));
+				staff.setLocation(locationDaoImpl.getLocation(staff.getAddressID()));
 				staffList.add(staff);
 			}
-			conn.close();
-			st.close();
 			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -74,22 +77,38 @@ public class StaffDaoImpl implements StaffDao {
 	}
 	@Override
 	public List<Staff> getStaffAtStore(int storeID) {
-		String query = "SELECT staff.staff_id, staff.first_name,staff.last_name,staff.address_id,staff.email,store.store_id,staff.username,staff.password,staff.last_update,store.manager_staff_id\n" + 
-				"FROM staff join store on staff.store_id = staff.store_id\n" + 
-				"WHERE staff.store_id = store.store_id;";
-		return getStaff(query);
+		List<Staff> staffList = new LinkedList<Staff>();
+		Connection conn = ConnectionFactory.getConnection();
+		try {
+			PreparedStatement ps = conn.prepareStatement("SELECT staff.staff_id, staff.first_name,staff.last_name,staff.address_id,staff.email,store.store_id,staff.username,staff.password,staff.last_update,store.manager_staff_id\n" + 
+					"FROM staff join store on staff.store_id = staff.store_id\n" + 
+					"WHERE staff.store_id = store.store_id;");
+			staffList = getStaff(ps);
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return staffList;
 	}
 
 	@Override
 	public List<Staff> getAllStaff() {
-		// TODO use preparedStatement
-		String query = "select * from sakila.staff";
-		return getStaff(query);
+		List<Staff> staffList = new LinkedList<Staff>();
+		Connection conn = ConnectionFactory.getConnection();
+		try {
+			PreparedStatement ps = conn.prepareStatement("select * from sakila.staff");
+			staffList = getStaff(ps);
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return staffList;
+
 	}
 
 	@Override
 	public Staff getStaff(int managerStaffID) {
-		// TODO implement for Website
+		// TODO implemnet for website
 		return null;
 	}
 

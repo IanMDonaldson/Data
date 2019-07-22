@@ -5,7 +5,7 @@ package com.iandonaldson.data;
  * 1 – List all movies and actors
  * 2 – List all stores and addresses
  * 3 – List all stores and staff.*/
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 public class Film {
@@ -20,10 +20,10 @@ public class Film {
 	private double replacementCost;
 	private String rating;
 	private List<Actor> actorList;
+	private Category category;
+	private Language language;
 	
-	
-	
-	public Film () {
+	public Film() {
 		
 	}
 
@@ -161,7 +161,26 @@ public class Film {
 
 
 
+	public Category getCategory() {
+		return category;
+	}
 
-	
+
+
+	public void setCategory(Category category) {
+		this.category = category;
+	}
+
+
+
+	public Language getLanguage() {
+		return language;
+	}
+
+
+
+	public void setLanguage(Language language) {
+		this.language = language;
+	}
 }
 

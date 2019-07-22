@@ -80,11 +80,12 @@ public class FilmDaoImpl implements FilmDao {
 	@Override
 	public List<Film> getAllFilms() {
 		List<Film> filmList = new LinkedList<Film>();
+		FilmDaoImpl filmDaoImpl = new FilmDaoImpl();
 		try {
 			Connection conn = ConnectionFactory.getConnection();
 			PreparedStatement ps = conn.prepareStatement("select * from film");
 			
-			filmList = getFilms(ps);
+			filmList = filmDaoImpl.getFilms(ps);
 			
 			ps.close();
 			conn.close();
@@ -101,8 +102,10 @@ public class FilmDaoImpl implements FilmDao {
 		try {
 			Connection conn = ConnectionFactory.getConnection();
 			
-			PreparedStatement ps = conn.prepareStatement("Select * from sakila.film where film_id = ?");
-			ps.setInt(1, ID);
+			PreparedStatement ps = conn.prepareStatement(
+					"Select *"
+					+ "from sakila.film where sakila.film.film_id = ?;");
+			ps.setString(1, Integer.toString(ID));
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
 				film.setTitle(rs.getString("title"));
@@ -114,10 +117,11 @@ public class FilmDaoImpl implements FilmDao {
 				film.setRentalRate(rs.getDouble("rental_rate"));
 				film.setReplacementCost(rs.getDouble("replacement_cost"));
 				film.setActorList(actorDaoImpl.setActorsForFilm(film));
-			} 
-			else {
+			} else {
 				film = null;
 			}
+			rs.close();
+			ps.close();
 			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -125,10 +129,36 @@ public class FilmDaoImpl implements FilmDao {
 		
 		return film;
 	}
-
+	/*Updates film, used by WebFilm.java class*/
 	@Override
 	public boolean updateFilm(Film film) {
-		return false;
+		boolean isUpdated = false;
+		Connection conn = ConnectionFactory.getConnection();
+		try {
+			PreparedStatement ps = conn.prepareStatement("update film "
+					+ "set title=?, description=?, release_year=?, length=?, rental_rate=?, replacement_cost=? "
+					+ "where film_id=?;");
+			ps.setString(1, film.getTitle());
+			ps.setString(2, film.getDescription());
+			ps.setDate(3, film.getReleaseDate());//changed getReleaseDate return type to a java.sql.Date
+			ps.setInt(4, film.getLength());
+			ps.setDouble(5, film.getRentalRate());
+			ps.setDouble(6, film.getReplacementCost());
+			ps.setInt(7, film.getId());
+			int colChanged = 0;
+			colChanged = ps.executeUpdate();
+			if (colChanged > 0) {
+				isUpdated=true;
+				conn.close();
+
+				return isUpdated;
+			}
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return isUpdated;
 	}
 
 	@Override
