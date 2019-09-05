@@ -94,25 +94,38 @@ public class FilmDaoImpl implements FilmDao {
 		}
 		return filmList;
 	}
+	
+	@Override
+	public List<Film> getFilmsByTitle(String title) {//checked for validSearch in WebFilm.java/searchFilmGET
+		List<Film> filmList = new LinkedList<Film>();
+		FilmDaoImpl filmDaoImpl = new FilmDaoImpl();
+		Connection conn = ConnectionFactory.getConnection();
+		try {
+			PreparedStatement ps = conn.prepareStatement("SELECT * FROM sakila.film "
+					+ "WHERE film.title LIKE CONCAT('%', ?, '%');");
+			ps.setString(1, title);
+			filmList = filmDaoImpl.getFilms(ps);
+			ps.close();
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return filmList;
+	}
 
 	@Override
 	public Film getFilm(int ID) {
 		Film film = new Film();
 		ActorDaoImpl actorDaoImpl = new ActorDaoImpl();
-		CategoryDaoImpl categoryDaoImpl = new CategoryDaoImpl();
-		LocationDaoImpl locationDaoImpl = new LocationDaoImpl();
-		LanguageDaoImpl languageDaoImpl = new LanguageDaoImpl();
 		try {
 			Connection conn = ConnectionFactory.getConnection();
-			//CATEGORY, LANGUAGE, ACTORLIST of film is set in their respective DAOIMPL's
-			//so don't change this preparedStatement
+			
 			PreparedStatement ps = conn.prepareStatement(
 					"Select *"
 					+ "from sakila.film where sakila.film.film_id = ?;");
 			ps.setString(1, Integer.toString(ID));
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
-				film.setId(rs.getInt("film_id"));
 				film.setTitle(rs.getString("title"));
 				film.setDescription(rs.getString("description"));
 				film.setReleaseDate(rs.getDate("release_year"));
@@ -121,9 +134,6 @@ public class FilmDaoImpl implements FilmDao {
 				film.setRentalDuration(rs.getInt("rental_duration"));
 				film.setRentalRate(rs.getDouble("rental_rate"));
 				film.setReplacementCost(rs.getDouble("replacement_cost"));
-				//Category, Language, and Actor DAOIMPL's use their own SQL statements
-				film.setCategory(categoryDaoImpl.setCategoryForFilm(film));
-				film.setLanguage(languageDaoImpl.setLanguageForFilm(film));
 				film.setActorList(actorDaoImpl.setActorsForFilm(film));
 			} else {
 				film = null;
@@ -143,26 +153,51 @@ public class FilmDaoImpl implements FilmDao {
 		boolean isUpdated = false;
 		Connection conn = ConnectionFactory.getConnection();
 		try {
-			PreparedStatement ps = conn.prepareStatement("Update film "
-					+ "set film.title=?, film.description=?, film.rental_rate=?, film.replacement_cost=?, film.rental_duration=?, film.length=? "
+			PreparedStatement ps = conn.prepareStatement("update film "
+					+ "set title=?, description=?, release_year=?, length=?, rental_rate=?, replacement_cost=? "
 					+ "where film_id=?;");
 			ps.setString(1, film.getTitle());
 			ps.setString(2, film.getDescription());
-			ps.setDouble(3, film.getRentalRate());
-			ps.setDouble(4, film.getReplacementCost());
-			ps.setInt(5, film.getRentalDuration());
-			ps.setInt(6, film.getLength());
+			ps.setDate(3, film.getReleaseDate());//changed getReleaseDate return type to a java.sql.Date
+			ps.setInt(4, film.getLength());
+			ps.setDouble(5, film.getRentalRate());
+			ps.setDouble(6, film.getReplacementCost());
 			ps.setInt(7, film.getId());
-			int colChanged = ps.executeUpdate();
-			if (colChanged != 0) {
+			int rowChanged = 0;
+			rowChanged = ps.executeUpdate();
+			if (rowChanged > 0) {
 				isUpdated=true;
-			}	
+				conn.close();
+
+				return isUpdated;
+			}
 			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
 		return isUpdated;
+	}
+	
+	@Override
+	public boolean searchFilmByTitle(String title) {
+		boolean validSearch = false;
+		Connection conn = ConnectionFactory.getConnection();
+		try {
+			PreparedStatement ps = conn.prepareStatement("SELECT * FROM sakila.film "
+					+ "WHERE film.title LIKE CONCAT('%', ?, '%');");
+			ps.setString(1, title);
+			ResultSet rs = ps.executeQuery();
+			if (rs != null) {
+				validSearch = true;
+			}
+			ps.close();
+			rs.close();
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return validSearch;
 	}
 
 	@Override
