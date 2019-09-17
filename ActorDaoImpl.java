@@ -6,11 +6,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
+
 
 public class ActorDaoImpl implements ActorDao {
 	public ActorDaoImpl() {
 		
 	}
+	
 	
 	@Override
 	public List<Actor> setActorsForFilm(Film film) {
@@ -41,6 +45,7 @@ public class ActorDaoImpl implements ActorDao {
 	public List<Actor> getActors(PreparedStatement ps) {
 		List<Actor> actors = new LinkedList<Actor>();
 		FilmDaoImpl filmDaoImpl = new FilmDaoImpl();
+		ActorLNameComparer lnameCompare = new ActorLNameComparer();
 		try {
 			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
@@ -52,6 +57,7 @@ public class ActorDaoImpl implements ActorDao {
 				actor.setFilmList(filmDaoImpl.setFilmsForActor(actor));
 				actors.add(actor);
 			}
+			Collections.sort(actors, lnameCompare.lastNameComparator);
 			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -65,8 +71,10 @@ public class ActorDaoImpl implements ActorDao {
 		List<Actor> actorList = new LinkedList<Actor>();
 		Connection conn = ConnectionFactory.getConnection();
 		try {
-			PreparedStatement ps = conn.prepareStatement("Select * from actor;");
+			PreparedStatement ps = conn.prepareStatement("Select * from actor order by ?;");
+			ps.setString(1, "last_name");
 			actorList = getActors(ps);
+			
 			ps.close();
 			conn.close();
 		} catch (SQLException e) {
@@ -110,5 +118,6 @@ public class ActorDaoImpl implements ActorDao {
 	public boolean deleteActor(int Id) {
 		return false;
 	}
+
 
 }

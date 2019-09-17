@@ -6,10 +6,11 @@ package com.iandonaldson.data;
  * 2 – List all stores and addresses
  * 3 – List all stores and staff.*/
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-public class Actor extends Person{
+public class Actor extends Person implements Comparable<Actor> {
 	private int id;
 	private Date lastUpdate;
 	private List<Film> filmList;
@@ -40,6 +41,12 @@ public class Actor extends Person{
 
 	public void setFilmList(List<Film> filmList) {
 		this.filmList = filmList;
+	}
+	
+
+	@Override
+	public int compareTo(Actor o) {
+		return this.getLastName().compareTo(o.getLastName());
 	}
 	
 	

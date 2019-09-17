@@ -126,6 +126,7 @@ public class FilmDaoImpl implements FilmDao {
 			ps.setString(1, Integer.toString(ID));
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
+				film.setId(rs.getInt("film_id"));
 				film.setTitle(rs.getString("title"));
 				film.setDescription(rs.getString("description"));
 				film.setReleaseDate(rs.getDate("release_year"));
@@ -154,15 +155,15 @@ public class FilmDaoImpl implements FilmDao {
 		Connection conn = ConnectionFactory.getConnection();
 		try {
 			PreparedStatement ps = conn.prepareStatement("update film "
-					+ "set title=?, description=?, release_year=?, length=?, rental_rate=?, replacement_cost=? "
+					+ "set title=?, description=?, length=?, rental_rate=?, replacement_cost=? "
 					+ "where film_id=?;");
 			ps.setString(1, film.getTitle());
 			ps.setString(2, film.getDescription());
-			ps.setDate(3, film.getReleaseDate());//changed getReleaseDate return type to a java.sql.Date
-			ps.setInt(4, film.getLength());
-			ps.setDouble(5, film.getRentalRate());
-			ps.setDouble(6, film.getReplacementCost());
-			ps.setInt(7, film.getId());
+			//ps.setDate(3, film.getReleaseDate());//changed getReleaseDate return type to a java.sql.Date
+			ps.setInt(3, film.getLength());
+			ps.setDouble(4, film.getRentalRate());
+			ps.setDouble(5, film.getReplacementCost());
+			ps.setInt(6, film.getId());
 			int rowChanged = 0;
 			rowChanged = ps.executeUpdate();
 			if (rowChanged > 0) {

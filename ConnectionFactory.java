@@ -1,28 +1,41 @@
 package com.iandonaldson.data;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
+import com.mysql.jdbc.Driver;
 
 public class ConnectionFactory {
 
-    public static Connection getConnection()
-    {
-      try {
-          Context initContext = new InitialContext();
-          Context envContext = (Context) initContext.lookup("java:comp/env");
-          DataSource ds = (DataSource)envContext.lookup("jdbc/sakila");
-          
-          return ds.getConnection();
-      } catch (SQLException ex) {
-          throw new RuntimeException("Error connecting to the database", ex);
-      } catch (NamingException e) {
-		e.printStackTrace();
-	}
-      return null;
-    }
+    
+
+public static final String URL = "jdbc:mysql://localhost:3306/sakila";
+
+public static final String USER = "testusr";
+
+public static final String PASS = "testpass";
+
+
+
+public static Connection getConnection()
+
+ {
+
+   try {
+
+       DriverManager.registerDriver(new Driver());
+
+       return DriverManager.getConnection(URL, USER, PASS);
+
+   } catch (SQLException ex) {
+
+       throw new RuntimeException("Error connecting to the database", ex);
+
+   }
+
+ }
+
+
+
 }
