@@ -11,6 +11,9 @@ public interface ActorDao {
 	public List<Actor> setActorsForFilm(Film film);
 	public List<Actor> getAllActors();
 	public Actor getActor(int Id);
+	public List<Actor> getActorsByName(String actorName);
+	public boolean validActorNameSearch(String actorName);
 	public boolean updateActor(Actor actor);
 	public boolean deleteActor(int Id);
+	public String actorSearchSQLQuery(String names[]);
 }

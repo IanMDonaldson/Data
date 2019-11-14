@@ -108,7 +108,59 @@ public class ActorDaoImpl implements ActorDao {
 		
 		return actor;
 	}
+	
+	@Override
+	public List<Actor> getActorsByName(String actorName) {
+		Connection conn = ConnectionFactory.getConnection();
+		List<Actor> actorList = new LinkedList<>();
+		
+		String[] names = actorName.split(" ");
+		String completeStatement = actorSearchSQLQuery(names);
+		
+		try {
+			PreparedStatement ps = conn.prepareStatement(completeStatement);
+			int j = 1;
+			for (int i = 0; i < names.length; i++) {
+				ps.setString(j, names[i]);
+				ps.setString(j+1, names[i]);
+				j+=2;
+			}
+			actorList = getActors(ps);
+			ps.close();
+			conn.close();
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return actorList;
+	}
 
+	@Override
+	public boolean validActorNameSearch(String actorName) {
+		boolean validSearch = false;
+		Connection conn = ConnectionFactory.getConnection();
+		String[] names = actorName.split(" ");
+		String completeStatement = actorSearchSQLQuery(names);
+		try {
+			PreparedStatement ps = conn.prepareStatement(completeStatement);
+			int j = 1;
+			for (int i = 0; i < names.length; i++) {			
+				ps.setString(j, names[i]);
+				ps.setString(j+1, names[i]);
+				j+=2;
+			}
+			ResultSet rs = ps.executeQuery();
+			if (rs != null) {
+				validSearch = true;
+			}
+			ps.close();
+			rs.close();
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return validSearch;
+	}
 	@Override
 	public boolean updateActor(Actor actor) {
 		return false;
@@ -118,6 +170,23 @@ public class ActorDaoImpl implements ActorDao {
 	public boolean deleteActor(int Id) {
 		return false;
 	}
-
+	@Override
+	public String actorSearchSQLQuery(String names[]) {
+		
+		String completeStatement = "SELECT * FROM actor WHERE actor.first_name LIKE "
+				+ "CONCAT('%', ?, '%') OR actor.last_name LIKE "
+				+ "CONCAT('%', ?, '%')";
+		if (names.length > 1) {
+			for (int i = 1; i < names.length; i++) {
+				String tempStatement = " UNION "
+						+ "SELECT * FROM actor WHERE actor.first_name LIKE "
+						+ "CONCAT('%', ?, '%') OR actor.last_name LIKE "
+						+ "CONCAT('%', ?, '%')";
+				completeStatement = completeStatement + tempStatement;
+			}
+		}
+		completeStatement += ";";
+		return completeStatement;
+	}
 
 }

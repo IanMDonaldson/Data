@@ -6,7 +6,6 @@ package com.iandonaldson.data;
  * 2 – List all stores and addresses
  * 3 – List all stores and staff.*/
 
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
