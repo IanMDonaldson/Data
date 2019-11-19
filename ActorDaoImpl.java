@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Collections;
-import java.util.Comparator;
 
 
 public class ActorDaoImpl implements ActorDao {
@@ -42,7 +41,7 @@ public class ActorDaoImpl implements ActorDao {
 	}
 	
 	
-	public List<Actor> getActors(PreparedStatement ps) {
+	public List<Actor> getActors(PreparedStatement ps) {//helper function
 		List<Actor> actors = new LinkedList<Actor>();
 		FilmDaoImpl filmDaoImpl = new FilmDaoImpl();
 		ActorLNameComparer lnameCompare = new ActorLNameComparer();
@@ -119,11 +118,13 @@ public class ActorDaoImpl implements ActorDao {
 		
 		try {
 			PreparedStatement ps = conn.prepareStatement(completeStatement);
-			int j = 1;
-			for (int i = 0; i < names.length; i++) {
-				ps.setString(j, names[i]);
-				ps.setString(j+1, names[i]);
-				j+=2;
+			if (names.length == 1) {
+				ps.setString(1, names[0]);
+				ps.setString(2, names[0]);
+			}
+			else if (names.length >= 2) {
+				ps.setString(1, names[0]);
+				ps.setString(2, names[1]);
 			}
 			actorList = getActors(ps);
 			ps.close();
@@ -143,11 +144,13 @@ public class ActorDaoImpl implements ActorDao {
 		String completeStatement = actorSearchSQLQuery(names);
 		try {
 			PreparedStatement ps = conn.prepareStatement(completeStatement);
-			int j = 1;
-			for (int i = 0; i < names.length; i++) {			
-				ps.setString(j, names[i]);
-				ps.setString(j+1, names[i]);
-				j+=2;
+			if (names.length == 1) {
+				ps.setString(1, names[0]);
+				ps.setString(2, names[0]);
+			}
+			else if (names.length >= 2) {
+				ps.setString(1, names[0]);
+				ps.setString(2, names[1]);
 			}
 			ResultSet rs = ps.executeQuery();
 			if (rs != null) {
@@ -163,7 +166,28 @@ public class ActorDaoImpl implements ActorDao {
 	}
 	@Override
 	public boolean updateActor(Actor actor) {
-		return false;
+		boolean isUpdated = false;
+		Connection conn = ConnectionFactory.getConnection();
+		try {
+			PreparedStatement ps = conn.prepareStatement("update actor "
+					+ "set first_name=?, last_name=?"
+					+ "where actor_id=?;");
+			ps.setString(1, actor.getFirstName());
+			ps.setString(2, actor.getLastName());
+			ps.setInt(3, actor.getId());
+			int rowChanged = ps.executeUpdate();
+			if (rowChanged > 0) {
+				isUpdated = true;
+				conn.close();
+				ps.close();
+				return isUpdated;
+			}
+			conn.close();
+			ps.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return isUpdated;
 	}
 
 	@Override
@@ -171,21 +195,22 @@ public class ActorDaoImpl implements ActorDao {
 		return false;
 	}
 	@Override
-	public String actorSearchSQLQuery(String names[]) {
-		
-		String completeStatement = "SELECT * FROM actor WHERE actor.first_name LIKE "
-				+ "CONCAT('%', ?, '%') OR actor.last_name LIKE "
-				+ "CONCAT('%', ?, '%')";
-		if (names.length > 1) {
-			for (int i = 1; i < names.length; i++) {
-				String tempStatement = " UNION "
-						+ "SELECT * FROM actor WHERE actor.first_name LIKE "
-						+ "CONCAT('%', ?, '%') OR actor.last_name LIKE "
-						+ "CONCAT('%', ?, '%')";
-				completeStatement = completeStatement + tempStatement;
-			}
+	public String actorSearchSQLQuery(String names[]) {//helper function
+		//TODO if one word search first OR last
+		//if two words search first AND last
+		//if three words disgregard it and more
+		String completeStatement = null;
+		if (names.length == 1) { // when one word search query, search by either last OR first
+			completeStatement = "SELECT * FROM actor WHERE actor.first_name LIKE "
+					+ "CONCAT('%', ?, '%') OR actor.last_name LIKE "
+					+ "CONCAT('%', ?, '%');";	
 		}
-		completeStatement += ";";
+		else if (names.length >= 2) { //search first names with the first word, and last names with the second, disregarding
+									  //the rest of the words (if there are more than two)
+			completeStatement = "SELECT * FROM actor WHERE actor.first_name LIKE "
+					+ "CONCAT('%', ?, '%') AND actor.last_name LIKE "
+					+ "CONCAT('%', ?, '%');";
+		}
 		return completeStatement;
 	}
 
