@@ -2,9 +2,9 @@ package com.iandonaldson.data;
 
 import java.util.Date;
 
-public class Customer {
+public class Customer implements Comparable<Customer>{
 	private int storeID;
-	private int ID;
+	private int id;
 	private int addressID;
 	private String firstName;
 	private String lastName;
@@ -70,15 +70,15 @@ public class Customer {
 	}
 
 	public int getID() {
-		return ID;
+		return this.id;
 	}
 
-	public void setID(int iD) {
-		ID = iD;
+	public void setID(int id) {
+		this.id = id;
 	}
 
 	public int getAddressID() {
-		return addressID;
+		return this.addressID;
 	}
 
 	public void setAddressID(int addressID) {
@@ -86,10 +86,14 @@ public class Customer {
 	}
 
 	public Location getLocation() {
-		return location;
+		return this.location;
 	}
 
 	public void setLocation(Location location) {
 		this.location = location;
+	}
+	@Override
+	public int compareTo(Customer c) {
+		return this.getLastName().compareTo(c.getLastName());
 	}
 }

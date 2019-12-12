@@ -191,8 +191,23 @@ public class ActorDaoImpl implements ActorDao {
 	}
 
 	@Override
-	public boolean deleteActor(int Id) {
-		return false;
+	public boolean deleteActor(Actor actor) {
+		boolean actorDeleted = false;
+		Connection conn = ConnectionFactory.getConnection();
+		try {
+			PreparedStatement ps = conn.prepareStatement("DELETE FROM actor "
+					+ "WHERE actor_id = ?;");
+			ps.setInt(1, actor.getId());
+			Integer i = ps.executeUpdate();
+			if (i != 0) {
+				actorDeleted = true;
+			}
+			ps.close();
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return actorDeleted;
 	}
 	@Override
 	public String actorSearchSQLQuery(String names[]) {//helper function
@@ -212,6 +227,97 @@ public class ActorDaoImpl implements ActorDao {
 					+ "CONCAT('%', ?, '%');";
 		}
 		return completeStatement;
+	}
+
+
+	@Override
+	public Actor addActor(Actor actor) {
+		//actor existing is previously verified so insertion into database is all this does
+		Connection conn = ConnectionFactory.getConnection();
+		try {
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO actor(actor_id, first_name, last_name) "
+					+ "VALUES (?, ?, ?);");
+			ps.setString(1, actor.getFirstName());
+			ps.setString(2, actor.getLastName());
+			ps.setInt(3, actor.getId());
+			ResultSet rs = ps.executeQuery();
+			
+			rs.close();
+			ps.close();
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return actor;
+	}
+
+
+	@Override
+	public Integer getNewActorID() {
+		Integer newActorID = -1;
+		Connection conn = ConnectionFactory.getConnection();
+		try {
+			PreparedStatement ps = conn.prepareStatement("select count(*) from actor;");
+			ResultSet rs = ps.executeQuery();
+			newActorID = rs.getInt("count") + 1;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return newActorID;
+	}
+
+
+	@Override
+	public boolean actorExists(Actor actor) {
+		//called from WebActor.addActorPOST
+		boolean actorExists = true;
+		Connection conn = ConnectionFactory.getConnection();
+		try {
+			PreparedStatement ps = conn.prepareStatement("Select * from actor "
+					+ "where (first_name LIKE CONCAT('%', ?, '%') AND "
+					+ "last_name LIKE CONCAT('%', ?, '%') ) OR actor_id = ?;");
+			ps.setString(1, actor.getFirstName());
+			ps.setString(2, actor.getLastName());
+			ps.setInt(3, actor.getId());
+			ResultSet rs = ps.executeQuery();
+			if (rs != null) {
+				actorExists = false; //if actor doesn't exist then we can add the actor
+				return actorExists;
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return actorExists;
+	}
+
+
+	@Override
+	public List<Actor> getRemovableActors() {
+		Connection conn = ConnectionFactory.getConnection();
+		List<Actor> actors = new LinkedList<Actor>();
+		FilmDaoImpl filmDaoImpl = new FilmDaoImpl();
+		try {
+			PreparedStatement ps = conn.prepareStatement("SELECT actor_id, first_name, last_name "
+					+ "FROM actor "
+					+ "WHERE NOT EXISTS(SELECT actor_id FROM film_actor WHERE film_actor.actor_id = actor.actor_id);");
+			ResultSet rs = ps.executeQuery();
+			if (rs != null) {
+				while (rs.next()) {
+					Actor actor = new Actor();
+					actor.setId(rs.getInt("actor_id"));
+					actor.setFirstName(rs.getString("first_name"));
+					actor.setLastName(rs.getString("last_name"));
+					actor.setFilmList(filmDaoImpl.setFilmsForActor(actor));
+					actors.add(actor);
+				}
+				return actors;
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }

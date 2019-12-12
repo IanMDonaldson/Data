@@ -12,9 +12,9 @@ public class ConnectionFactory {
 
 public static final String URL = "jdbc:mysql://localhost:3306/sakila";
 
-public static final String USER = "testusr";
+public static final String USER = "dragomundoh";
 
-public static final String PASS = "testpass";
+public static final String PASS = "Kstujdfw34hgacvmaste";
 
 
 
