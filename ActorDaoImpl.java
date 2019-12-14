@@ -237,9 +237,9 @@ public class ActorDaoImpl implements ActorDao {
 		try {
 			PreparedStatement ps = conn.prepareStatement("INSERT INTO actor(actor_id, first_name, last_name) "
 					+ "VALUES (?, ?, ?);");
-			ps.setString(1, actor.getFirstName());
-			ps.setString(2, actor.getLastName());
-			ps.setInt(3, actor.getId());
+			ps.setInt(1, actor.getId());
+			ps.setString(2, actor.getFirstName());
+			ps.setString(3, actor.getLastName());
 			ResultSet rs = ps.executeQuery();
 			
 			rs.close();
@@ -257,9 +257,10 @@ public class ActorDaoImpl implements ActorDao {
 		Integer newActorID = -1;
 		Connection conn = ConnectionFactory.getConnection();
 		try {
-			PreparedStatement ps = conn.prepareStatement("select count(*) from actor;");
+			PreparedStatement ps = conn.prepareStatement("select COUNT(*) from actor;");
 			ResultSet rs = ps.executeQuery();
-			newActorID = rs.getInt("count") + 1;
+			rs.next();
+			newActorID = rs.getInt("count(*)") + 1;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
