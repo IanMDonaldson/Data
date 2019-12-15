@@ -230,26 +230,17 @@ public class ActorDaoImpl implements ActorDao {
 	}
 
 
-	@Override
-	public Actor addActor(Actor actor) {
-		//actor existing is previously verified so insertion into database is all this does
-		Connection conn = ConnectionFactory.getConnection();
-		try {
-			PreparedStatement ps = conn.prepareStatement("INSERT INTO actor(actor_id, first_name, last_name) "
-					+ "VALUES (?, ?, ?);");
-			ps.setInt(1, actor.getId());
-			ps.setString(2, actor.getFirstName());
-			ps.setString(3, actor.getLastName());
-			ResultSet rs = ps.executeQuery();
-			
-			rs.close();
-			ps.close();
-			conn.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return actor;
-	}
+	/*
+	 * @Override public Actor addActor(Actor actor) { //actor existing is previously
+	 * verified so insertion into database is all this does Connection conn =
+	 * ConnectionFactory.getConnection(); try { PreparedStatement ps =
+	 * conn.prepareStatement("INSERT INTO actor(first_name, last_name) " +
+	 * "VALUES (?, ?);"); ps.setString(1, actor.getFirstName()); ps.setString(2,
+	 * actor.getLastName());
+	 * 
+	 * ps.close(); conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+	 * return actor; }
+	 */
 
 
 	@Override
@@ -257,10 +248,13 @@ public class ActorDaoImpl implements ActorDao {
 		Integer newActorID = -1;
 		Connection conn = ConnectionFactory.getConnection();
 		try {
-			PreparedStatement ps = conn.prepareStatement("select COUNT(*) from actor;");
+			PreparedStatement ps = conn.prepareStatement("select * from sakila.actor A "
+					+ "order by A.actor_id desc limit 1;");
 			ResultSet rs = ps.executeQuery();
 			rs.next();
-			newActorID = rs.getInt("count(*)") + 1;
+			newActorID = rs.getInt("actor_id") + 1;
+			rs.close();
+			return newActorID;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -319,6 +313,32 @@ public class ActorDaoImpl implements ActorDao {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	@Override
+	public boolean addActor(Actor actor) {
+		//actor existing is previously verified so insertion into database is all this does
+		boolean isAddSuccessful = false;
+		Connection conn = ConnectionFactory.getConnection();
+		try {
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO actor(first_name, last_name) "
+					+ "VALUES (?, ?);");
+			ps.setString(1, actor.getFirstName());
+			ps.setString(2, actor.getLastName());
+			int rowChanged = ps.executeUpdate();
+			if (rowChanged == 0) {
+				return isAddSuccessful;
+			} else {
+				isAddSuccessful = true;
+				ps.close();
+				conn.close();
+				return isAddSuccessful;
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return isAddSuccessful;
 	}
 
 }

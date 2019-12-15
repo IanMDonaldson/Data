@@ -3,10 +3,11 @@ package com.iandonaldson.data;
 import java.util.List;
 
 public interface ActorDao {
-	public Actor addActor(Actor actor);
+	//public Actor addActor(Actor actor);
 	public Actor getActor(int Id);
 	
 	public boolean actorExists(Actor actor);
+	public boolean addActor(Actor actor);
 	public boolean deleteActor(Actor actor);
 	public boolean updateActor(Actor actor);
 	public boolean validActorNameSearch(String actorName);
