@@ -12,7 +12,11 @@ public interface FilmDao {
 	public List<Film> getAllFilms();
 	public List<Film> getFilmsByTitle(String title);
 	public Film getFilm(int Id);
+	public Integer getNewFilmID();
+	
 	public boolean updateFilm(Film film);
 	public boolean searchFilmByTitle(String title);
-	public boolean deleteFilm(int Id);
+	public boolean deleteFilm(int id);
+	public boolean filmExists(Film film);
+	public boolean addFilm(Film film);
 }

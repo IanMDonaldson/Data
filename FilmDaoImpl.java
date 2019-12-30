@@ -26,9 +26,9 @@ public class FilmDaoImpl implements FilmDao {
 				film.setId(rs.getInt("film_id"));
 				film.setTitle(rs.getString("title"));
 				film.setDescription(rs.getNString("description"));
-				film.setReleaseDate(rs.getDate("release_year"));
+				film.setReleaseYear(rs.getDate("release_year"));
 				film.setRating(rs.getString("rating"));
-				film.setLanguageId(rs.getInt("language_id"));
+				film.setLanguageID(rs.getInt("language_id"));
 				film.setRentalDuration(rs.getInt("rental_duration"));
 				film.setLength(rs.getInt("length"));
 				film.setReplacementCost(rs.getDouble("replacement_cost"));
@@ -54,9 +54,9 @@ public class FilmDaoImpl implements FilmDao {
 				film.setId(rs.getInt("film_id"));
 				film.setTitle(rs.getString("title"));
 				film.setDescription(rs.getNString("description"));
-				film.setReleaseDate(rs.getDate("release_year"));
+				film.setReleaseYear(rs.getDate("release_year"));
 				film.setRating(rs.getString("rating"));
-				film.setLanguageId(rs.getInt("language_id"));
+				film.setLanguageID(rs.getInt("language_id"));
 				film.setRentalDuration(rs.getInt("rental_duration"));
 				film.setLength(rs.getInt("length"));
 				film.setReplacementCost(rs.getDouble("replacement_cost"));
@@ -129,9 +129,9 @@ public class FilmDaoImpl implements FilmDao {
 				film.setId(rs.getInt("film_id"));
 				film.setTitle(rs.getString("title"));
 				film.setDescription(rs.getString("description"));
-				film.setReleaseDate(rs.getDate("release_year"));
+				film.setReleaseYear(rs.getDate("release_year"));
 				film.setLength(rs.getInt("length"));
-				film.setLanguageId(rs.getInt("language_id"));
+				film.setLanguageID(rs.getInt("language_id"));
 				film.setRentalDuration(rs.getInt("rental_duration"));
 				film.setRentalRate(rs.getDouble("rental_rate"));
 				film.setReplacementCost(rs.getDouble("replacement_cost"));
@@ -179,7 +179,7 @@ public class FilmDaoImpl implements FilmDao {
 		
 		return isUpdated;
 	}
-	
+
 	@Override
 	public boolean searchFilmByTitle(String title) {
 		boolean validSearch = false;
@@ -202,8 +202,92 @@ public class FilmDaoImpl implements FilmDao {
 	}
 
 	@Override
-	public boolean deleteFilm(int Id) {
-		return false;
+	public boolean deleteFilm(int id) {
+		boolean filmDeleted = false;
+		Connection conn = ConnectionFactory.getConnection();
+		try {
+			PreparedStatement ps = conn.prepareStatement("DELETE FROM film "
+					+ "WHERE film_id = ?;");
+			ps.setInt(1, id);
+			int i = ps.executeUpdate();
+			if (i != 0) {
+				filmDeleted = true;
+			}
+			ps.close();
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return filmDeleted;
 	}
+	@Override
+	public boolean filmExists(Film film) {
+		boolean filmExists = true;
+		Connection conn = ConnectionFactory.getConnection();
+		try {
+			PreparedStatement ps = conn.prepareStatement("Selct * from film "
+				+ "where (title LIKE CONCAT('%', ?, '%')) OR film_id = ?;");
+			ps.setString(1, film.getTitle());
+			ps.setInt(2, film.getId());
+			ResultSet rs = ps.executeQuery();
+			if (rs != null) {
+				filmExists = false;
+				return filmExists;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return filmExists;
+	}
+	@Override
+	public boolean addFilm(Film film) {
+		boolean isAddSuccessful = false;
+		Connection conn = ConnectionFactory.getConnection();
+		try {
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO film(title, description, release_year, language_id, rental_duration, "
+					+ "rental_rate, length, replacement_cost, rating) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
+			ps.setString(1, film.getTitle());
+			ps.setString(2, film.getDescription());
+			ps.setDate(3, film.getReleaseYear());
+			ps.setInt(4, film.getLanguageID());
+			ps.setInt(5, film.getRentalDuration());
+			ps.setDouble(6, film.getRentalRate());
+			ps.setInt(7, film.getLength());
+			ps.setDouble(8, film.getReplacementCost());
+			ps.setString(9, film.getRating());
+			int rowChanged = ps.executeUpdate();
+			if (rowChanged == 0) {
+				return isAddSuccessful; //false
+			} else {
+				isAddSuccessful = true;
+				ps.close();
+				conn.close();
+				return isAddSuccessful;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return isAddSuccessful;
+	}
+	@Override
+	public Integer getNewFilmID() {
+		int newFilmID = -1;
+		Connection conn = ConnectionFactory.getConnection();
+		try {
+			PreparedStatement ps = conn.prepareStatement("select * from sakila.film F "
+					+ "order by F.film_id desc limit 1;");
+			ResultSet rs = ps.executeQuery();
+			rs.next();
+			newFilmID = rs.getInt("film_id");
+			rs.close();
+			ps.close();
+			conn.close();
+			return newFilmID;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return newFilmID;
+	}
+	
 
 }

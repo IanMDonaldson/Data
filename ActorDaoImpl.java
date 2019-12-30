@@ -341,4 +341,18 @@ public class ActorDaoImpl implements ActorDao {
 		return isAddSuccessful;
 	}
 
+
+	@Override
+	public List<Actor> getActorsNotAssocWFilm(Film film) {
+		List<Actor> actorsNotAssoc = new LinkedList<Actor>();
+		Connection conn = ConnectionFactory.getConnection();
+		
+		try {
+			PreparedStatement ps = conn.prepareStatement("select * from sakila.actor A join sakila.film_actor F on F.actor_id");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 }

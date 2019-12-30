@@ -12,14 +12,15 @@ public class Film {
 	private int id;
 	private String title;
 	private String description;
-	private Date releaseDate;
-	private int languageId;
+	private Date releaseYear;
+	private int languageID;
 	private int rentalDuration;
 	private double rentalRate;
 	private int length;
 	private double replacementCost;
 	private String rating;
 	private List<Actor> actorList;
+	private String specialFeatures;
 	private Category category;
 	private Language language;
 	
@@ -27,7 +28,29 @@ public class Film {
 		
 	}
 
-
+	public Film(String title,
+			String description,
+			String rating,
+			String specialFeatures,
+			int id,
+			int languageID,
+			int rentalDuration,
+			int length,
+			double rentalRate,
+			Date releaseYear
+			) 
+	{
+		this.title = title;
+		this.description = description;
+		this.rating = rating;
+		this.specialFeatures = specialFeatures;
+		this.id = id;
+		this.languageID = languageID;
+		this.rentalDuration = rentalDuration;
+		this.length = length;
+		this.rentalRate = rentalRate;
+		this.releaseYear = releaseYear;
+	}
 
 	public int getId() {
 		return id;
@@ -62,32 +85,6 @@ public class Film {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-
-
-	public Date getReleaseDate() {
-		return releaseDate;
-	}
-
-
-
-	public void setReleaseDate(Date releaseDate) {
-		this.releaseDate = releaseDate;
-	}
-
-
-
-	public int getLanguageId() {
-		return languageId;
-	}
-
-
-
-	public void setLanguageId(int languageId) {
-		this.languageId = languageId;
-	}
-
-
 
 	public int getRentalDuration() {
 		return rentalDuration;
@@ -181,6 +178,30 @@ public class Film {
 
 	public void setLanguage(Language language) {
 		this.language = language;
+	}
+
+	public String getSpecialFeatures() {
+		return specialFeatures;
+	}
+
+	public void setSpecialFeatures(String specialFeatures) {
+		this.specialFeatures = specialFeatures;
+	}
+
+	public int getLanguageID() {
+		return languageID;
+	}
+
+	public void setLanguageID(int languageID) {
+		this.languageID = languageID;
+	}
+
+	public Date getReleaseYear() {
+		return releaseYear;
+	}
+
+	public void setReleaseYear(Date releaseYear) {
+		this.releaseYear = releaseYear;
 	}
 }
 
