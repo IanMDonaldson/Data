@@ -20,7 +20,7 @@ public class Film {
 	private double replacementCost;
 	private String rating;
 	private List<Actor> actorList;
-	private String specialFeatures;
+//	private List<String> specialFeatures;
 	private Category category;
 	private Language language;
 	
@@ -29,21 +29,21 @@ public class Film {
 	}
 
 	public Film(String title,
-			String description,
-			String rating,
-			String specialFeatures,
-			int id,
-			int languageID,
-			int rentalDuration,
-			int length,
-			double rentalRate,
-			Date releaseYear
+				String description,
+				String rating,
+				/*List<String> specialFeatures,*/
+				int id,
+				int languageID,
+				int rentalDuration,
+				int length,
+				double rentalRate,
+				Date releaseYear
 			) 
 	{
 		this.title = title;
 		this.description = description;
 		this.rating = rating;
-		this.specialFeatures = specialFeatures;
+		//this.specialFeatures = specialFeatures;
 		this.id = id;
 		this.languageID = languageID;
 		this.rentalDuration = rentalDuration;
@@ -180,14 +180,14 @@ public class Film {
 		this.language = language;
 	}
 
-	public String getSpecialFeatures() {
+	/*public List<String> getSpecialFeatures() {
 		return specialFeatures;
 	}
 
-	public void setSpecialFeatures(String specialFeatures) {
+	public void setSpecialFeatures(List<String> specialFeatures) {
 		this.specialFeatures = specialFeatures;
 	}
-
+*/
 	public int getLanguageID() {
 		return languageID;
 	}

@@ -24,6 +24,7 @@ public class ActorDaoImpl implements ActorDao {
 			ps.setInt(1, film.getId());
 			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
+
 				Actor actor = new Actor();
 				actor.setFirstName(rs.getString("first_name"));
 				actor.setLastName(rs.getString("last_name"));
@@ -198,7 +199,7 @@ public class ActorDaoImpl implements ActorDao {
 			PreparedStatement ps = conn.prepareStatement("DELETE FROM actor "
 					+ "WHERE actor_id = ?;");
 			ps.setInt(1, actor.getId());
-			Integer i = ps.executeUpdate();
+			int i = ps.executeUpdate();
 			if (i != 0) {
 				actorDeleted = true;
 			}
@@ -213,7 +214,7 @@ public class ActorDaoImpl implements ActorDao {
 	public String actorSearchSQLQuery(String names[]) {//helper function
 		//TODO if one word search first OR last
 		//if two words search first AND last
-		//if three words disgregard it and more
+		//if three words disregard it and more
 		String completeStatement = null;
 		if (names.length == 1) { // when one word search query, search by either last OR first
 			completeStatement = "SELECT * FROM actor WHERE actor.first_name LIKE "
@@ -245,7 +246,7 @@ public class ActorDaoImpl implements ActorDao {
 
 	@Override
 	public Integer getNewActorID() {
-		Integer newActorID = -1;
+		int newActorID = -1;
 		Connection conn = ConnectionFactory.getConnection();
 		try {
 			PreparedStatement ps = conn.prepareStatement("select * from sakila.actor A "
@@ -344,15 +345,12 @@ public class ActorDaoImpl implements ActorDao {
 
 	@Override
 	public List<Actor> getActorsNotAssocWFilm(Film film) {
-		List<Actor> actorsNotAssoc = new LinkedList<Actor>();
-		Connection conn = ConnectionFactory.getConnection();
-		
-		try {
-			PreparedStatement ps = conn.prepareStatement("select * from sakila.actor A join sakila.film_actor F on F.actor_id");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
+		ActorDaoImpl actorDaoImpl = new ActorDaoImpl();
+		List<Actor>	actorsNotAssoc = actorDaoImpl.getAllActors();
+    	List<Actor> assocWFilm = film.getActorList();
+    	actorsNotAssoc.removeAll(assocWFilm); // remove all in AssocWFilm from actorsNotAssoc for a separate list :D
+
+		return actorsNotAssoc;
 	}
 
 }

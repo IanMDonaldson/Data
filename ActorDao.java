@@ -17,7 +17,8 @@ public interface ActorDao {
 	public List<Actor> getActorsByName(String actorName);
 	public List<Actor> getAllActors();
 	public List<Actor> getRemovableActors(); //returns to Actor deletion page
-	public List<Actor> setActorsForFilm(Film film);
+
+	abstract List<Actor> setActorsForFilm(Film film);
 	public List<Actor> getActorsNotAssocWFilm(Film film);
 	
 	public String actorSearchSQLQuery(String names[]);
