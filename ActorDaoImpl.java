@@ -16,7 +16,7 @@ public class ActorDaoImpl implements ActorDao {
 	
 	
 	@Override
-	public List<Actor> setActorsForFilm(Film film) {
+	public List<Actor> getActorsForFilm(Film film) {
 		List<Actor> actorList = new LinkedList<Actor>();
 		Connection conn = ConnectionFactory.getConnection();
 		try {
@@ -54,7 +54,7 @@ public class ActorDaoImpl implements ActorDao {
 				actor.setLastName(rs.getString("last_name"));
 				actor.setId(rs.getInt("actor_id"));
 				actor.setLastUpdate(rs.getDate("last_update"));
-				actor.setFilmList(filmDaoImpl.setFilmsForActor(actor));
+				actor.setFilmList(filmDaoImpl.getFilmsForActor(actor));
 				actors.add(actor);
 			}
 			Collections.sort(actors, lnameCompare.lastNameComparator);
@@ -97,7 +97,7 @@ public class ActorDaoImpl implements ActorDao {
 				actor.setLastName(rs.getString("last_name"));
 				actor.setId(rs.getInt("actor_id"));
 				actor.setLastUpdate(rs.getDate("last_update"));
-				actor.setFilmList(filmDaoImpl.setFilmsForActor(actor));
+				actor.setFilmList(filmDaoImpl.getFilmsForActor(actor));
 			}
 			conn.close();
 			ps.close();
@@ -156,9 +156,9 @@ public class ActorDaoImpl implements ActorDao {
 			ResultSet rs = ps.executeQuery();
 			if (rs != null) {
 				validSearch = true;
+				rs.close();
 			}
 			ps.close();
-			rs.close();
 			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -304,7 +304,7 @@ public class ActorDaoImpl implements ActorDao {
 					actor.setId(rs.getInt("actor_id"));
 					actor.setFirstName(rs.getString("first_name"));
 					actor.setLastName(rs.getString("last_name"));
-					actor.setFilmList(filmDaoImpl.setFilmsForActor(actor));
+					actor.setFilmList(filmDaoImpl.getFilmsForActor(actor));
 					actors.add(actor);
 				}
 				return actors;

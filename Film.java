@@ -1,7 +1,7 @@
 package com.iandonaldson.data;
 /* a) list all the stores and their addresses (that’s going to require a Join)
  * b) list the stores and their staff.
- * That’s going to require a Join AND using an inherited class. 
+ * That’s going to require a Join AND using an inherited class.
  * 1 – List all movies and actors
  * 2 – List all stores and addresses
  * 3 – List all stores and staff.*/
@@ -9,24 +9,52 @@ import java.sql.Date;
 import java.util.List;
 
 public class Film {
-	private int id;
-	private String title;
-	private String description;
-	private Date releaseYear;
-	private int languageID;
-	private int rentalDuration;
-	private double rentalRate;
-	private int length;
-	private double replacementCost;
-	private String rating;
-	private List<Actor> actorList;
-//	private List<String> specialFeatures;
 	private Category category;
+	private Date releaseYear;
 	private Language language;
-	
+	private List<Actor> actorList;
+	private String description;
+	private String rating;
+	private String title;
+	private double rentalRate;
+	private double replacementCost;
+	private int id;
+	private int languageID;
+	private int length;
+	private int rentalDuration;
+//	private List<String> specialFeatures;
+
 	public Film() {
-		
+
 	}
+
+	public Film(String title,
+	             String description,
+	             String rating,
+			/*List<String> specialFeatures,*/
+			     int id,
+			     int languageID,
+			     int rentalDuration,
+			     int length,
+			     double rentalRate,
+			     double replacementCost,
+			     List<Actor> actorList,
+			     Date releaseYear
+	) {
+		this.title = title;
+		this.description = description;
+		this.rating = rating;
+		//this.specialFeatures = specialFeatures;
+		this.id = id;
+		this.languageID = languageID;
+		this.rentalDuration = rentalDuration;
+		this.length = length;
+		this.rentalRate = rentalRate;
+		this.replacementCost = replacementCost;
+		this.actorList = actorList;
+		this.releaseYear = releaseYear;
+	}
+
 
 	public Film(String title,
 				String description,
@@ -37,8 +65,9 @@ public class Film {
 				int rentalDuration,
 				int length,
 				double rentalRate,
+				double replacementCost,
 				Date releaseYear
-			) 
+			)
 	{
 		this.title = title;
 		this.description = description;
@@ -49,6 +78,7 @@ public class Film {
 		this.rentalDuration = rentalDuration;
 		this.length = length;
 		this.rentalRate = rentalRate;
+		this.replacementCost = replacementCost;
 		this.releaseYear = releaseYear;
 	}
 

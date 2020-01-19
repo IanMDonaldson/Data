@@ -8,13 +8,13 @@ import java.sql.SQLException;
 
 public class ConnectionFactory {
 
-    
+
 
 public static final String URL = "jdbc:mysql://localhost:3306/sakila";
 
-public static final String USER = "dragomundoh";
+public static final String USER = "testuser";
 
-public static final String PASS = "Kstujdfw34hgacvmaste";
+public static final String PASS = "testpass";
 
 
 
